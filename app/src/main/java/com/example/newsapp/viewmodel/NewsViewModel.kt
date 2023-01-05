@@ -25,6 +25,8 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository) 
     }
 
     private fun updateState() {
+        _uiState.value = UiState(status = Status.LOADING, articles = null)
+
         viewModelScope.launch(Dispatchers.IO) {
             val articles = repository.getArticles()
             if (articles != null) {
@@ -42,6 +44,10 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository) 
                 }
             }
         }
+    }
+
+    fun checkForUpdate() {
+        updateState()
     }
 
     fun getArticle(pos: Int): Article? {

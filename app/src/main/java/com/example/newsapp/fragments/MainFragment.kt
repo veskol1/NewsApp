@@ -63,6 +63,11 @@ class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        newsViewModel.checkForUpdate()
+    }
+
     private fun configureRecyclerView(articles: ArrayList<Article>) {
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = ArticlesAdapter(articles, this@MainFragment)
@@ -78,4 +83,6 @@ class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
         val action = MainFragmentDirections.actionMainFragmentToArticaleFragment(article!!)
         findNavController().navigate(action)
     }
+
+
 }
