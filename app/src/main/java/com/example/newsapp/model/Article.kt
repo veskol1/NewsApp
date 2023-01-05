@@ -11,17 +11,17 @@ data class NewsArticles(
 @Parcelize
 data class Article(
     @SerializedName("urlToImage")
-    val image: String,
+    val image: String?,
 
     @SerializedName("author")
-    val name: String,
+    val name: String?,
 
     @SerializedName("title")
-    val title: String,
+    val title: String?,
 
     @SerializedName("description")
-    val desc: String,
+    val desc: String?,
 
     @SerializedName("publishedAt")
-    val date: String
+    val date: String?
 ) : Parcelable
