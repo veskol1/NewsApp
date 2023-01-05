@@ -9,6 +9,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newsapp.adapter.ArticlesAdapter
 import com.example.newsapp.databinding.FragmentMainBinding
 import com.example.newsapp.model.Article
 import com.example.newsapp.viewmodel.NewsViewModel
@@ -61,7 +63,8 @@ class MainFragment : Fragment() {
     }
 
     private fun configureRecyclerView(articles: ArrayList<Article>) {
-        //to do
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.adapter = ArticlesAdapter(articles)
     }
 
     override fun onDestroyView() {

@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,8 +26,21 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository) 
 
     private fun updateState() {
         viewModelScope.launch(Dispatchers.IO) {
-            val responseCheck = repository.getArticles()
-            Log.d("haha","responseCheck="+responseCheck)
+            val articles = repository.getArticles()
+            if (articles != null) {
+                _uiState.emit(
+                    UiState(
+                        status = Status.DONE,
+                        articles = articles
+                    )
+                )
+            } else {
+                _uiState.update {
+                    it.copy(
+                        status = Status.ERROR
+                    )
+                }
+            }
         }
     }
 }
