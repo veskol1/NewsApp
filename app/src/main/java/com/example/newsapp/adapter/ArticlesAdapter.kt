@@ -9,10 +9,15 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.newsapp.databinding.ListItemArticleBinding
 import com.example.newsapp.model.Article
 
-class ArticlesAdapter(private val articles: ArrayList<Article>):
+class ArticlesAdapter(private val articles: ArrayList<Article>, val listener: ArticleClickListener):
     RecyclerView.Adapter<ArticlesAdapter.ArticlesViewHolder>() {
 
     inner class ArticlesViewHolder(val binding: ListItemArticleBinding): RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.root.setOnClickListener {
+                listener.onArticlesClicked(position = adapterPosition)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticlesViewHolder {
@@ -40,4 +45,7 @@ class ArticlesAdapter(private val articles: ArrayList<Article>):
 
     override fun getItemCount(): Int = articles.size
 
+    interface ArticleClickListener {
+        fun onArticlesClicked(position: Int)
+    }
 }

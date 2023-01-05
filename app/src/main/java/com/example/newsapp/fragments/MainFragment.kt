@@ -1,6 +1,7 @@
 package com.example.newsapp.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainFragment : Fragment() {
+class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
@@ -64,11 +65,15 @@ class MainFragment : Fragment() {
 
     private fun configureRecyclerView(articles: ArrayList<Article>) {
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerView.adapter = ArticlesAdapter(articles)
+        binding.recyclerView.adapter = ArticlesAdapter(articles, this@MainFragment)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onArticlesClicked(position: Int) {
+        Log.d("haha","position is= "+position)
     }
 }
