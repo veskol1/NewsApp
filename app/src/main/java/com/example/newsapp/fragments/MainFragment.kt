@@ -1,7 +1,6 @@
 package com.example.newsapp.fragments
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -76,7 +75,7 @@ class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
 
     override fun onArticlesClicked(position: Int) {
         val article = newsViewModel.getArticle(pos = position)
-        val action = MainFragmentDirections.actionMainFragmentToArticaleFragment()
+        val action = MainFragmentDirections.actionMainFragmentToArticaleFragment(article!!)
         findNavController().navigate(action)
     }
 }
