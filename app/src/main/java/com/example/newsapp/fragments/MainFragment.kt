@@ -1,12 +1,11 @@
 package com.example.newsapp.fragments
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -25,7 +24,8 @@ class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private val newsViewModel: NewsViewModel by viewModels()
+    private val newsViewModel: NewsViewModel by activityViewModels()
+    private val adapter = ArticlesAdapter(articles = arrayListOf(), this@MainFragment)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +37,9 @@ class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.adapter = adapter
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -56,7 +59,7 @@ class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
                             binding.progressBar.visibility = View.GONE
                             binding.errorView.visibility = View.GONE
                             binding.recyclerView.visibility = View.VISIBLE
-                            uiState.articles?.let { configureRecyclerView(it) }
+                            uiState.articles?.let { updateAdapterList(it) }
                         }
                     }
                 }
@@ -69,9 +72,8 @@ class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
         newsViewModel.checkForUpdate()
     }
 
-    private fun configureRecyclerView(articles: ArrayList<Article>) {
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerView.adapter = ArticlesAdapter(articles, this@MainFragment)
+    private fun updateAdapterList(articles: ArrayList<Article>) {
+        adapter.updateList(articles)
     }
 
     override fun onDestroyView() {
