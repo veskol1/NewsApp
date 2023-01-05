@@ -43,6 +43,10 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository) 
             }
         }
     }
+
+    fun getArticle(pos: Int): Article? {
+        return uiState.value.articles?.get(pos)
+    }
 }
 
 data class UiState(
