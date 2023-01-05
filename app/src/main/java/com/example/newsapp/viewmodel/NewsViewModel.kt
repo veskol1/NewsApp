@@ -1,15 +1,34 @@
 package com.example.newsapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.newsapp.model.Article
+import com.example.newsapp.repository.NewsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NewsViewModel: ViewModel() {
+@HiltViewModel
+class NewsViewModel @Inject constructor(private val repository: NewsRepository) : ViewModel() {
     private val _uiState =
         MutableStateFlow(UiState(status = Status.LOADING, articles = arrayListOf()))
     var uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    init {
+        updateState()
+    }
+
+    private fun updateState() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val responseCheck = repository.getArticles()
+            Log.d("haha","responseCheck="+responseCheck)
+        }
+    }
 }
 
 data class UiState(

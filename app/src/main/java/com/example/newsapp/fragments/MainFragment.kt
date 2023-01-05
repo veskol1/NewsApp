@@ -13,8 +13,10 @@ import com.example.newsapp.databinding.FragmentMainBinding
 import com.example.newsapp.model.Article
 import com.example.newsapp.viewmodel.NewsViewModel
 import com.example.newsapp.viewmodel.Status
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
