@@ -1,10 +1,11 @@
 package com.example.newsapp.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +18,7 @@ import com.example.newsapp.model.Article
 import com.example.newsapp.viewmodel.NewsViewModel
 import com.example.newsapp.viewmodel.Status
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -25,7 +27,7 @@ class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
     private val binding get() = _binding!!
 
     private val newsViewModel: NewsViewModel by activityViewModels()
-    private val adapter = ArticlesAdapter(articles = arrayListOf(), this@MainFragment)
+    private val adapter = ArticlesAdapter(this@MainFragment)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +45,8 @@ class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                newsViewModel.uiState.collect{ uiState ->
+                newsViewModel.uiState.collectLatest{ uiState ->
+                    Log.d("haha","collect")
                     when(uiState.status) {
                         Status.LOADING -> {
                             binding.progressBar.visibility = View.VISIBLE
@@ -69,11 +72,11 @@ class MainFragment : Fragment(), ArticlesAdapter.ArticleClickListener {
 
     override fun onResume() {
         super.onResume()
-        newsViewModel.checkForUpdate()
+        newsViewModel.updateNewArticles()
     }
 
-    private fun updateAdapterList(articles: ArrayList<Article>) {
-        adapter.updateList(articles)
+    private fun updateAdapterList(articles: List<Article>) {
+        adapter.submitList(articles)
     }
 
     override fun onDestroyView() {

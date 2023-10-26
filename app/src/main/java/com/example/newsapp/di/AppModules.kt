@@ -1,10 +1,15 @@
 package com.example.newsapp.di
 
+import android.content.Context
+import androidx.room.Room
 import com.example.newsapp.api.NewsApi
 import com.example.newsapp.repository.NewsRepository
+import com.example.newsapp.room.ArticleDao
+import com.example.newsapp.room.ArticleDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -28,8 +33,19 @@ object AppModules {
 
     @Provides
     @Singleton
-    fun newsRepositoryProvide(newApi: NewsApi): NewsRepository {
-        return NewsRepository(newApi)
+    fun newsRepositoryProvide(newApi: NewsApi, articleDao: ArticleDao): NewsRepository {
+        return NewsRepository(newApi, articleDao)
     }
 
+    @Provides
+    fun provideDao(articleDatabase: ArticleDatabase) : ArticleDao = articleDatabase.articleDao()
+
+
+    @Provides
+    @Singleton
+    fun provideRoomDatabase(@ApplicationContext appContext: Context): ArticleDatabase {
+        return Room.databaseBuilder(appContext,
+            ArticleDatabase::class.java, "database name"
+        ).build()
+    }
 }

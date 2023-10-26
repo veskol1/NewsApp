@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,33 +21,48 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository) 
     var uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     init {
-        updateState()
+        fetchingData()
     }
 
-    private fun updateState() {
-        _uiState.value = UiState(status = Status.LOADING, articles = null)
+    private fun fetchingData() {
+
+        _uiState.update { uiState ->
+            uiState.copy(
+                status = Status.LOADING
+            )
+        }
 
         viewModelScope.launch(Dispatchers.IO) {
-            val articles = repository.getArticles()
-            if (articles != null) {
-                _uiState.emit(
-                    UiState(
-                        status = Status.DONE,
-                        articles = articles
-                    )
-                )
-            } else {
-                _uiState.update {
-                    it.copy(
-                        status = Status.ERROR
-                    )
+            updateStateStatus(repository.fetchData())
+            updateStateArticlesData()
+        }
+    }
+
+    private fun updateStateArticlesData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getArticles().collectLatest { articles ->
+                if (articles.isNotEmpty()) {
+                    _uiState.update { uiState ->
+                        uiState.copy(
+                            articles = articles,
+                            status = Status.DONE
+                        )
+                    }
                 }
             }
         }
     }
 
-    fun checkForUpdate() {
-        updateState()
+    private fun updateStateStatus(status: Status) {
+        _uiState.update { uiState ->
+            uiState.copy(
+                status = status
+            )
+        }
+    }
+
+    fun updateNewArticles() {
+        fetchingData()
     }
 
     fun getArticle(pos: Int): Article? {
@@ -56,7 +72,7 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository) 
 
 data class UiState(
     val status: Status,
-    val articles: ArrayList<Article>?
+    val articles: List<Article>?
 )
 
 enum class Status {

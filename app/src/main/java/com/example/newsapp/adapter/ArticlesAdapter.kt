@@ -2,6 +2,8 @@ package com.example.newsapp.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -9,8 +11,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.newsapp.databinding.ListItemArticleBinding
 import com.example.newsapp.model.Article
 
-class ArticlesAdapter(private var articles: ArrayList<Article>, val listener: ArticleClickListener):
-    RecyclerView.Adapter<ArticlesAdapter.ArticlesViewHolder>() {
+class ArticlesAdapter( val listener: ArticleClickListener) : ListAdapter<Article, ArticlesAdapter.ArticlesViewHolder>(DiffCallback()) {
 
     inner class ArticlesViewHolder(val binding: ListItemArticleBinding): RecyclerView.ViewHolder(binding.root) {
         init {
@@ -20,35 +21,36 @@ class ArticlesAdapter(private var articles: ArrayList<Article>, val listener: Ar
         }
     }
 
+    private class DiffCallback : DiffUtil.ItemCallback<Article>() {
+        override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean {
+            return oldItem.hashCode() == newItem.hashCode()
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticlesViewHolder {
         val binding = ListItemArticleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ArticlesViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ArticlesViewHolder, position: Int) {
-        with(holder) {
-            with(articles[position]) {
-                binding.apply {
-                    newspaperTitle.text = title
-                    newspaperName.text = name
-                    newspaperDesc.text = desc
-                    newspaperDate.text = date
+        val item = getItem(position)
+
+                holder.binding.apply {
+                    newspaperTitle.text = item.title
+                    newspaperName.text = item.name
+                    newspaperDesc.text = item.desc
+                    newspaperDate.text = item.date
 
                     Glide.with(holder.itemView.context)
-                        .load(image)
+                        .load(item.image)
                         .transform(CenterCrop(), RoundedCorners(16))
                         .into(articleImage)
                 }
-            }
-        }
     }
-
-    fun updateList(articles: ArrayList<Article>) {
-        this.articles = articles
-        notifyDataSetChanged()
-    }
-
-    override fun getItemCount(): Int = articles.size
 
     interface ArticleClickListener {
         fun onArticlesClicked(position: Int)
